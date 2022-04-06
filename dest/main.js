@@ -136,14 +136,14 @@ let progressBar = document.querySelector(".progress-bar");
 
 const progressBarHandle = () => {
     window.addEventListener("scroll", (e) => {
-        let winScroll = window.scrollY
+        let winScroll = window.scrollY;
         let height = document.body.offsetHeight - window.innerHeight;
         let scrolled = (winScroll / height) * 100;
         progressBar.style.width = scrolled + "%";
     });
 
     window.addEventListener("load", (e) => {
-        let winScroll = window.scrollY
+        let winScroll = window.scrollY;
         let height = document.body.offsetHeight - window.innerHeight;
         let scrolled = (winScroll / height) * 100;
         progressBar.style.width = scrolled + "%";
@@ -151,5 +151,119 @@ const progressBarHandle = () => {
 };
 progressBarHandle();
 
+//Scroll to section
 
-//
+let menuItem = document.querySelectorAll(
+    ".header .container-fluid .header__menu .header__menu-item a"
+);
+let sections = [];
+
+const removeActive = () => {
+    menuItem.forEach((itemMenu, index) => {
+        itemMenu.classList.remove("active");
+    });
+};
+
+const scrollToSection = () => {
+    menuItem.forEach((item, index) => {
+        let href = item.getAttribute("href").replace("#", ".");
+        let section = document.querySelector(href);
+        sections.push(section);
+        item.addEventListener("click", (e) => {
+            e.preventDefault();
+            window.scrollTo({
+                top: section.offsetTop - header.offsetHeight + 1,
+                behavior: "smooth",
+            });
+            removeActive();
+            item.classList.add("active");
+        });
+    });
+
+    window.addEventListener("scroll", (e) => {
+        sections.forEach((section, index) => {
+            if (
+                window.pageYOffset > section.offsetTop - header.offsetHeight &&
+                window.pageYOffset < section.offsetTop + section.offsetHeight
+            ) {
+                removeActive();
+                menuItem[index].classList.add("active");
+            } else {
+                menuItem[index].classList.remove("active");
+            }
+        });
+    });
+};
+scrollToSection();
+
+//Popop up
+let btn_video = document.querySelectorAll(
+    ".scvideo .scvideo__list .scvideo__list-item .thumbnail"
+);
+let iframe = document.querySelector(".popup-video iframe");
+let popup_video = document.querySelector(".popup-video");
+let close = document.querySelector(".popup-video .close");
+
+const popopUpHandle = () => {
+    btn_video.forEach((item) => {
+        item.addEventListener("click", (e) => {
+            let video_id = item.getAttribute("data-id");
+            iframe.setAttribute(
+                "src",
+                "https://www.youtube.com/embed/" + video_id
+            );
+            popup_video.classList.add("active");
+        });
+    });
+
+    close.addEventListener("click", () => {
+        popup_video.classList.remove("active");
+    });
+};
+popopUpHandle();
+
+// Slider
+let listItemSlider = document.querySelectorAll(
+    ".schero .schero__list .schero__list-item"
+);
+
+let dot = document.querySelectorAll("dot");
+
+const sliderHandle = () => {
+    let currentSlider = 0;
+    listItemSlider.forEach((item, index) => {
+        if (item.classList.contains("active")) {
+            currentSlider = index;
+        }
+    });
+    document
+        .querySelector(".btn-arrow.--next")
+        .addEventListener("click", () => {
+            if (currentSlider < listItemSlider.length - 1) {
+                listItemSlider[currentSlider].classList.remove("active");
+                listItemSlider[currentSlider + 1].classList.add("active");
+                currentSlider++;
+            } else {
+                listItemSlider[currentSlider].classList.remove("active");
+                listItemSlider[0].classList.add("active");
+                currentSlider = 0;
+            }
+        });
+
+    document
+        .querySelector(".btn-arrow.--prev")
+        .addEventListener("click", () => {
+            if (currentSlider > 0) {
+                listItemSlider[currentSlider].classList.remove("active");
+                listItemSlider[currentSlider - 1].classList.add("active");
+                currentSlider--;
+            } else {
+                listItemSlider[currentSlider].classList.remove("active");
+                listItemSlider[listItemSlider.length - 1].classList.add("active");
+                currentSlider = listItemSlider.length - 1;
+            }
+        });
+};
+sliderHandle();
+
+
