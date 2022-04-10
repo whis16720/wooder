@@ -17,7 +17,6 @@ const addBackGroundHeader = () => {
         }
     });
 };
-addBackGroundHeader();
 
 // Languages
 
@@ -51,8 +50,6 @@ const languagesHandle = () => {
     });
 };
 
-languagesHandle();
-
 //Mobile Hamburger
 
 let hamburger = document.querySelector(
@@ -73,7 +70,6 @@ const hamburgerHandle = () => {
         }
     });
 };
-hamburgerHandle();
 
 // News Tabs
 
@@ -106,7 +102,6 @@ const newsTabsHandle = () => {
         });
     });
 };
-newsTabsHandle();
 
 // Back to top
 let backToTop = document.querySelector(".backtop");
@@ -116,8 +111,12 @@ const backToTopHandle = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     });
 
+    $(".btn__top").on("click", (e) => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
     window.addEventListener("scroll", (e) => {
-        if (window.pageYOffset > header.offsetHeight) {
+        if (window.pageYOffset > 600) {
             backToTop.classList.add("active");
         } else {
             backToTop.classList.remove("active");
@@ -129,7 +128,6 @@ const backToTopHandle = () => {
         }
     });
 };
-backToTopHandle();
 
 // Progress Bar
 let progressBar = document.querySelector(".progress-bar");
@@ -149,22 +147,34 @@ const progressBarHandle = () => {
         progressBar.style.width = scrolled + "%";
     });
 };
-progressBarHandle();
 
 //Scroll to section
-
 let menuItem = document.querySelectorAll(
     ".header .container-fluid .header__menu .header__menu-item a"
 );
-let sections = [];
+let mobileMenuItem = document.querySelectorAll(".navbar .container ul li a");
 
-const removeActive = () => {
+let sections = [];
+const removeActive = (item) => {
     menuItem.forEach((itemMenu, index) => {
         itemMenu.classList.remove("active");
     });
 };
 
 const scrollToSection = () => {
+    mobileMenuItem.forEach((item) => {
+        let href = item.getAttribute("href").replace("#", ".");
+        let section = document.querySelector(href);
+        item.addEventListener("click", (e) => {
+            e.preventDefault();
+            window.scrollTo({
+                top: section.offsetTop - header.offsetHeight + 1,
+                behavior: "smooth",
+            });
+            menuMobile.classList.remove("active");
+            hamburger.classList.remove("active");
+        });
+    });
     menuItem.forEach((item, index) => {
         let href = item.getAttribute("href").replace("#", ".");
         let section = document.querySelector(href);
@@ -194,7 +204,6 @@ const scrollToSection = () => {
         });
     });
 };
-scrollToSection();
 
 //Popop up
 let btn_video = document.querySelectorAll(
@@ -217,53 +226,152 @@ const popopUpHandle = () => {
     });
 
     close.addEventListener("click", () => {
+        iframe.setAttribute("src", "");
+        popup_video.classList.remove("active");
+    });
+    $(".popup-video").on("click", (e) => {
+        iframe.setAttribute("src", "");
         popup_video.classList.remove("active");
     });
 };
-popopUpHandle();
 
-// Slider
-let listItemSlider = document.querySelectorAll(
-    ".schero .schero__list .schero__list-item"
-);
+// Slider Hero
+let heroSlider = ".schero .schero__list";
 
-let dot = document.querySelectorAll("dot");
+let number = ".schero .schero__bottom .schero__bottom-left span";
+
+let dots = ".schero__bottom-left";
 
 const sliderHandle = () => {
-    let currentSlider = 0;
-    listItemSlider.forEach((item, index) => {
-        if (item.classList.contains("active")) {
-            currentSlider = index;
-        }
+    $(heroSlider).flickity({
+        cellAlign: "left",
+        contain: true,
+        wrapAround: true,
+        prevNextButtons: false,
+        pageDots: true,
+        autoPlay: 2000,
+        on: {
+            change(e) {
+                $(number).html((e + 1).toString().padStart(2, 0));
+            },
+            ready() {
+                let e = $(".flickity-page-dots");
+                $(dots).append(e);
+            },
+        },
     });
-    document
-        .querySelector(".btn-arrow.--next")
-        .addEventListener("click", () => {
-            if (currentSlider < listItemSlider.length - 1) {
-                listItemSlider[currentSlider].classList.remove("active");
-                listItemSlider[currentSlider + 1].classList.add("active");
-                currentSlider++;
-            } else {
-                listItemSlider[currentSlider].classList.remove("active");
-                listItemSlider[0].classList.add("active");
-                currentSlider = 0;
-            }
-        });
+    $(".btn-arrow.--next").on("click", function (e) {
+        e.preventDefault();
+        $(heroSlider).flickity("next");
+    });
+    $(".btn-arrow.--prev").on("click", function (e) {
+        e.preventDefault();
+        $(heroSlider).flickity("previous");
+    });
+};
 
-    document
-        .querySelector(".btn-arrow.--prev")
-        .addEventListener("click", () => {
-            if (currentSlider > 0) {
-                listItemSlider[currentSlider].classList.remove("active");
-                listItemSlider[currentSlider - 1].classList.add("active");
-                currentSlider--;
-            } else {
-                listItemSlider[currentSlider].classList.remove("active");
-                listItemSlider[listItemSlider.length - 1].classList.add("active");
-                currentSlider = listItemSlider.length - 1;
-            }
+//Slider
+
+let slider = document.querySelector(".scslider .scslider__list");
+
+const showSliderDrag = () => {
+    $(slider).flickity({
+        cellAlign: "left",
+        contain: true,
+        prevNextButtons: false,
+        pageDots: false,
+        imagesLoaded: 4,
+        freeScroll: true,
+    }),
+        $(slider).on("scroll.flickity", function (e, w) {
+            w = 100 * w + "%";
+            $(".progress").css("width", w);
         });
 };
-sliderHandle();
+
+Fancybox.bind("[data-fancybox]", {
+    infinite: true,
+    keyboard: {
+        Escape: "close",
+        Delete: "close",
+        Backspace: "close",
+        PageUp: "next",
+        PageDown: "prev",
+        ArrowUp: "next",
+        ArrowDown: "prev",
+        ArrowRight: "next",
+        ArrowLeft: "prev",
+    },
+});
+const start = () => {
+    addBackGroundHeader();
+    languagesHandle();
+    hamburgerHandle();
+    newsTabsHandle();
+    backToTopHandle();
+    progressBarHandle();
+    scrollToSection();
+    popopUpHandle();
+    sliderHandle();
+    showSliderDrag();
+    AOS.init();
+};
+start();
+
+// Loading
 
 
+
+let loading = document.querySelector(".main-loading");
+window.addEventListener("DOMContentLoaded", () => {
+    setTimeout(() => {
+        loading.style.display = "none";
+    }, 1500);
+});
+
+// const sliderHandle = () => {
+//     let currentSlider = 0;
+//     listItemSlider.forEach((item, index) => {
+//         if (item.classList.contains("active")) {
+//             currentSlider = index;
+//         }
+//     });
+//     document
+//         .querySelector(".btn-arrow.--next")
+//         .addEventListener("click", () => {
+//             if (currentSlider < listItemSlider.length - 1) {
+//                 goTo(currentSlider + 1);
+//             } else {
+//                 goTo(0);
+//             }
+//         });
+
+//     document
+//         .querySelector(".btn-arrow.--prev")
+//         .addEventListener("click", () => {
+//             if (currentSlider > 0) {
+//                 goTo(currentSlider - 1);
+//             } else {
+//                 goTo(listItemSlider.length - 1);
+//             }
+//         });
+
+//     dot[currentSlider].classList.add("active");
+
+//     dot.forEach((item, index) => {
+//         item.addEventListener("click", () => {
+//             goTo(index);
+//         });
+//     });
+
+//     const goTo = (index) => {
+//         listItemSlider[currentSlider].classList.remove("active");
+//         listItemSlider[index].classList.add("active");
+//         dot[currentSlider].classList.remove("active");
+//         dot[index].classList.add("active");
+
+//         currentSlider = index;
+//         number.textContent = (currentSlider + 1).toString().padStart(2, 0);
+//     };
+// };
+// sliderHandle();
